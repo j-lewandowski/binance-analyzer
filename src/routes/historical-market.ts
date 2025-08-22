@@ -21,7 +21,7 @@ historicalMarketRouter.get("/data", async (req, res) => {
     console.log("klines() rate limits:", rateLimits);
 
     const data = response.data;
-    res.json(data);
+    res.json({ data });
   } catch (error) {
     console.error("klines() error:", error);
   } finally {
