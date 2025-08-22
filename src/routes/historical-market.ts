@@ -5,6 +5,29 @@ import { SpotRestAPI, SpotWebsocketAPI } from "@binance/spot";
 const historicalMarketRouter = Router();
 
 historicalMarketRouter.get("/data", async (req, res) => {
+  const { startTime, endTime, symbol } = req.query;
+
+  if (!symbol) {
+    res.status(400).json({
+      message: "Symobl must be provided.",
+    });
+  }
+
+  if (!startTime || !endTime) {
+    res.status(400).json({
+      message: "Start and end time must be provided.",
+    });
+  }
+
+  const validatedStartTime = parseInt(startTime as string);
+  const validatedEndTime = parseInt(endTime as string);
+
+  if (validatedStartTime > validatedEndTime) {
+    res.status(400).json({
+      message: "Provided start time needs to be before end time.",
+    });
+  }
+
   let connection;
 
   try {
@@ -12,8 +35,8 @@ historicalMarketRouter.get("/data", async (req, res) => {
 
     const response = await connection.klines({
       symbol: "BNBUSDT",
-      // startTime: 1655969280000,
-      // endTime: 1655969290000,
+      startTime: validatedStartTime,
+      endTime: validatedEndTime,
       interval: SpotWebsocketAPI.KlinesIntervalEnum.INTERVAL_1h,
     });
 
